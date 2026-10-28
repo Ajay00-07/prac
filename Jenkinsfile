@@ -22,8 +22,11 @@ pipeline {
 
 stage('Login to Docker Hub') {
     steps {
-        bat 'echo %Dockerhub_PAT%| docker login -u ajaykumar2602 --password-stdin'
-    }
+            withCredentials([usernamePassword(credentialsId: 'Dockerhub_PAT', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+            
+            // Execute using Windows batch. Notice there is no space before the pipe symbol (|)
+            bat 'echo %DOCKER_PASSWORD%| docker login -u %DOCKER_USER% --password-stdin'
+        }
 }
 
 
