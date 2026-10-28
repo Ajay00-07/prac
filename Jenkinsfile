@@ -29,9 +29,12 @@ stage('Login to DockerHub') {
             usernameVariable: 'DOCKERHUB_USERNAME',
             passwordVariable: 'DOCKERHUB_TOKEN'
         )]) {
-            bat '''
-                @echo off
-                <nul set /p "=%DOCKERHUB_TOKEN%" | docker login -u "%DOCKERHUB_USERNAME%" --password-stdin
+            powershell '''
+                $token = $env:DOCKERHUB_TOKEN.Trim()
+                $token | docker login -u $env:DOCKERHUB_USERNAME --password-stdin
+                if ($LASTEXITCODE -ne 0) {
+                    exit $LASTEXITCODE
+                }
             '''
         }
     }
