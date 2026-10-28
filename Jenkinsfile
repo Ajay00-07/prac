@@ -20,22 +20,22 @@ pipeline {
             }
         }
 
-
-        
-        
 stage('Login to Docker Hub') {
     steps {
-                withCredentials([string(
-                    credentialsId: 'DockerCredential',
-                    variable: 'DOCKER_PAT'
-                )]) {
-                    bat '''
-                    @echo off
-                    echo %DOCKER_PAT%|docker login -u akshatha29 --password-stdin
-                   if errorlevel 1 exit /b 1
-                    '''
-                }
-            }}
+        withCredentials([
+            string(
+                credentialsId: 'Dockerhub_PAT',
+                variable: 'DOCKER_PAT'
+            )
+        ]) {
+            bat '''
+                @echo off
+                echo %DOCKER_PAT% | docker login -u ajaykumar2602 --password-stdin
+                if errorlevel 1 exit /b 1
+            '''
+        }
+    }
+}
 
 
 
