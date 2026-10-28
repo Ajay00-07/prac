@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'ajaykumar2602/myapp1'
+        DOCKER_TAG = 'v1'
     }
 
     stages {
@@ -15,37 +16,32 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t %DOCKER_IMAGE%:v1 .'
+                bat 'docker build -t %DOCKER_IMAGE%:%DOCKER_TAG% .'
             }
         }
 
         stage('Login to DockerHub') {
             steps {
-                withCredentials([
-                    string(
-                        credentialsId: 'Dockerhub_PAT',
-                        variable: 'DOCKER_PAT'
-                    )
-                ]) {
-                    bat '''
-                        @echo off
-                        echo %DOCKER_PAT%| docker login -u ajaykumar2602 --password-stdin
-                        if errorlevel 1 exit /b 1
-                    '''
+                withCredentials([usernamePassword(
+                    credentialsId: 'Dockerhub_PAT',
+                    usernameVariable: 'DOCKERHUB_USERNAME',
+                    passwordVariable: 'DOCKERHUB_TOKEN'
+                )]) {
+                    bat 'echo %DOCKERHUB_TOKEN% | docker login -u %DOCKERHUB_USERNAME% --password-stdin'
                 }
             }
         }
 
         stage('Push Docker Image') {
             steps {
-                bat 'docker push %DOCKER_IMAGE%:latest'
+                bat 'docker push %DOCKER_IMAGE%:%DOCKER_TAG%'
             }
         }
     }
 
     post {
         success {
-            echo 'Docker image built and pushed successfully.'
+            echo 'Docker image v1 built and pushed successfully!'
         }
 
         failure {
